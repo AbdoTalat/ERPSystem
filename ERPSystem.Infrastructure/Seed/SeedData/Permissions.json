@@ -1,0 +1,101 @@
+{
+  "User": [
+    "User.View",
+    "User.Add",
+    "User.Edit",
+    "User.Delete",
+    "User.AssignRoles"
+  ],
+  "Role": [
+    "Role.View",
+    "Role.Add",
+    "Role.Edit",
+    "Role.Delete"
+  ],
+  "Branch": [
+    "Branch.View",
+    "Branch.Add",
+    "Branch.Edit",
+    "Branch.Delete"
+  ],
+  "Department": [
+    "Department.View",
+    "Department.Add",
+    "Department.Edit",
+    "Department.Delete"
+  ],
+  "Employee": [
+    "Employee.View",
+    "Employee.Add",
+    "Employee.Edit",
+    "Employee.Delete"
+  ],
+  "Category": [
+    "Category.View",
+    "Category.Add",
+    "Category.Edit",
+    "Category.Delete"
+  ],
+  "Product": [
+    "Product.View",
+    "Product.Add",
+    "Product.Edit",
+    "Product.Delete"
+  ],
+  "Stock": [
+    "Stock.View",
+    "Stock.Add",
+    "Stock.Edit",
+    "Stock.Transfer",
+    "Stock.Delete"
+  ],
+  "Warehouse": [
+    "Warehouse.View",
+    "Warehouse.Add",
+    "Warehouse.Edit",
+    "Warehouse.Delete"
+  ],
+  "Supplier": [
+    "Supplier.View",
+    "Supplier.Add",
+    "Supplier.Edit",
+    "Supplier.Delete"
+  ],
+  "PurchaseOrder": [
+    "PurchaseOrder.View",
+    "PurchaseOrder.Add",
+    "PurchaseOrder.Edit",
+    "PurchaseOrder.Delete",
+    "PurchaseOrder.Cancell",
+    "PurchaseOrder.Approve",
+    "PurchaseOrder.ReceiveGoods"
+  ],
+  "Customer": [
+    "Customer.View",
+    "Customer.Add",
+    "Customer.Edit",
+    "Customer.Delete"
+  ],
+  "SalesOrder": [
+    "SalesOrder.View",
+    "SalesOrder.Add",
+    "SalesOrder.Confirm",
+    "SalesOrder.Cancell",
+    "SalesOrder.Complete",
+    "SalesOrder.Edit",
+    "SalesOrder.Delete"
+  ],
+  "Invoice": [
+    "Invoice.View",
+    "Invoice.Add",
+    "Invoice.Cancell",
+    "Invoice.Delete"
+  ],
+  "Payment": [
+    "Payment.View",
+    "Payment.Add",
+    "Payment.Edit",
+    "Payment.Delete",
+    "Payment.Refund"
+  ]
+}

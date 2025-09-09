@@ -1,0 +1,29 @@
+[
+  {
+    "Name": "Cairo Branch",
+    "Description": "Main corporate branch",
+    "City": "Cairo",
+    "Street": "Tahrir Square",
+    "Zip_Code": "11511",
+    "ContactNumber": "+20-111-111-1111",
+    "IsActive": true
+  },
+  {
+    "Name": "Alexandria Branch",
+    "Description": "Seaside branch for coastal operations",
+    "City": "Alexandria",
+    "Street": "Corniche Road",
+    "Zip_Code": "21532",
+    "ContactNumber": "+20-222-222-2222",
+    "IsActive": true
+  },
+  {
+    "Name": "Giza Branch",
+    "Description": "Handles logistics and west Cairo",
+    "City": "Giza",
+    "Street": "Pyramids Street",
+    "Zip_Code": "12511",
+    "ContactNumber": "+20-333-333-3333",
+    "IsActive": true
+  }
+]
