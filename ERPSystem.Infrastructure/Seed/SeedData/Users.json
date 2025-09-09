@@ -1,0 +1,14 @@
+[
+  {
+    "UserName": "admin",
+    "FirstName": "admin",
+    "LastName": "admin",
+    "NormalizedUserName": "ADMIN",
+    "Email": "admin@system.com",
+    "NormalizedEmail": "ADMIN@SYSTEM.COM",
+    "EmailConfirmed": true,
+    "Password": "Admin@123",
+    "IsActive": true,
+    "Roles": [ "Admin" ]
+  }
+]
