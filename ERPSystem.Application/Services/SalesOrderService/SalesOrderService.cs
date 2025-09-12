@@ -41,7 +41,6 @@ namespace ERPSystem.Application.Services.SalesOrderService
 
             return ApiResponseHelper<IEnumerable<GetSalesOrderDTO>>.ResponseSuccess(data: so);
         }
-
         public async Task<ApiResponseHelper<GetSalesOrderDTO>> GetSalesOrderByIdAsync(int Id)
         {
             var so = await _unitOfWork.Repository<SalesOrder>().GetByIdAsDtoAsync<GetSalesOrderDTO>(Id);
@@ -58,31 +57,21 @@ namespace ERPSystem.Application.Services.SalesOrderService
 
             return ApiResponseHelper<IEnumerable<GetSalesOrderDTO>>.ResponseSuccess(data: po);
         }
-
         public async Task<ApiResponseHelper<GetSalesOrderDTO>> AddSalesOrderAsync(SalesOrderDTO dto)
         {
-            var isCustomerExist = await _unitOfWork.Repository<Customer>()
-                .IsExistsAsync(c => c.Id == dto.CustomerId && c.IsActive);
+            var isCustomerExist = await _unitOfWork.Repository<Customer>().IsExistsAsync(c => c.Id == dto.CustomerId && c.IsActive);
             if (!isCustomerExist)
-            {
                 return ApiResponseHelper<GetSalesOrderDTO>.ResponseFailure(StatusCodes.NOT_FOUND, $"Customer not found or not active.");
-            }
-
+            
             if (!dto.Lines.Any())
-            {
                 return ApiResponseHelper<GetSalesOrderDTO>.ResponseFailure(StatusCodes.BAD_REQUEST, "Order must have at least one line.");
-            }
-
-            try
-            {
+            
                 var productIDs = dto.Lines.Select(l => l.ProductId).ToList();
                 var invalidProductIds = await _productRepository.CheckProductsExistById(productIDs);
 
                 if (invalidProductIds.Any())
-                {
                     return ApiResponseHelper<GetSalesOrderDTO>.ResponseFailure(StatusCodes.BAD_REQUEST,
                         $"Invalid Product IDs: {string.Join(", ", invalidProductIds)}");
-                }
 
                 var orderToAdd = new SalesOrder
                 {
@@ -92,13 +81,14 @@ namespace ERPSystem.Application.Services.SalesOrderService
                     SalesOrderLines = new List<SalesOrderLine>()
                 };
 
+                var warehouseIDs = dto.Lines.Select(l => l.WarehouseId).ToList();
+                var stocks = await _unitOfWork.Repository<Stock>().GetAllAsync(s => productIDs.Contains(s.ProductId)
+                        && warehouseIDs.Contains(s.WarehouseId), includes: s => s.Product);
+
+                var StockDict = stocks.ToDictionary(s => (s.ProductId, s.WarehouseId));
                 foreach (var line in dto.Lines)
                 {
-                    var stock = await _unitOfWork.Repository<Stock>()
-                        .FirstOrDefaultAsync(s => s.ProductId == line.ProductId
-                        && s.WarehouseId == line.WarehouseId, includes: s => s.Product);
-
-                    if (stock == null || stock.AvailableQuantity < line.Quantity)
+                    if (!StockDict.TryGetValue((line.ProductId, line.WarehouseId), out var stock) || stock.AvailableQuantity < line.Quantity)
                     {
                         return ApiResponseHelper<GetSalesOrderDTO>.ResponseFailure(StatusCodes.BAD_REQUEST,
                             $"Insufficient stock for Product {line.ProductId} in Warehouse {line.WarehouseId}.");
@@ -115,7 +105,8 @@ namespace ERPSystem.Application.Services.SalesOrderService
 
                     orderToAdd.SalesOrderLines.Add(orderLine);
                 }
-
+            try
+            {
                 orderToAdd.TotalAmount = orderToAdd.SalesOrderLines.Sum(l => l.LineTotal);
 
                 await _unitOfWork.Repository<SalesOrder>().AddNewAsync(orderToAdd);
@@ -127,39 +118,32 @@ namespace ERPSystem.Application.Services.SalesOrderService
             }
             catch (Exception ex)
             {
-                return ApiResponseHelper<GetSalesOrderDTO>.ResponseFailure(StatusCodes.INTERNAL_SERVER_ERROR, ex.Message);
+                return ApiResponseHelper<GetSalesOrderDTO>.ResponseFailure(StatusCodes.INTERNAL_SERVER_ERROR, ex.InnerException.Message);
             }
         }
         public async Task<ApiResponseHelper<GetSalesOrderDTO>> EditSalesOrderByIdAsync(int Id, SalesOrderDTO dto)
         {
             var oldSalesOrder = await _unitOfWork.Repository<SalesOrder>().GetByIdAsync(Id);
             if (oldSalesOrder == null)
-            {
                 return ApiResponseHelper<GetSalesOrderDTO>.ResponseFailure(StatusCodes.NOT_FOUND, message: $"Sales Order Not found with ID: {Id}");
-            }
+            
             if (!dto.Lines.Any())
-            {
                 return ApiResponseHelper<GetSalesOrderDTO>.ResponseFailure(StatusCodes.BAD_REQUEST, "Order must have at least one line.");
-            }
-
+            
             var productIDs = dto.Lines.Select(l => l.ProductId).ToList();
             var invalidProductIds = await _productRepository.CheckProductsExistById(productIDs);
 
             if (invalidProductIds.Any())
-            {
                 return ApiResponseHelper<GetSalesOrderDTO>.ResponseFailure(StatusCodes.BAD_REQUEST,
                     $"Invalid Product IDs: {string.Join(", ", invalidProductIds)}");
-            }
-
+            
             try
             {
-                var poLines = await _unitOfWork.Repository<SalesOrderLine>().
-                    GetAllAsync(pol => pol.SalesOrderId == oldSalesOrder.Id);
+                var poLines = await _unitOfWork.Repository<SalesOrderLine>().GetAllAsync(pol => pol.SalesOrderId == oldSalesOrder.Id);
 
                 _unitOfWork.Repository<SalesOrderLine>().DeleteRange(poLines);
 
                 _mapper.Map(dto, oldSalesOrder);
-
                 oldSalesOrder.TotalAmount = oldSalesOrder.SalesOrderLines.Sum(l => l.LineTotal);
 
                 _unitOfWork.Repository<SalesOrder>().Update(oldSalesOrder);

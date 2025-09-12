@@ -78,19 +78,20 @@ namespace ERPSystem.Application.Services.UserService
             {
                 var userToAdd = _mapper.Map<AppUser>(userDTO);
                 var result = await _userManager.CreateAsync(userToAdd, userDTO.Password);
+                var userBranches = new List<UserBranches>();
 
                 if (result.Succeeded)
                 {
                     foreach (var branchId in userDTO.BranchIds)
                     {
-                        var userBranches = new UserBranches
+                        userBranches.Add(new UserBranches
                         {
                             BranchId = branchId,
                             UserId = userToAdd.Id,
                             IsDefaultBranch = branchId == userDTO.DefaultBranchId
-                        };
-                        await _unitOfWork.Repository<UserBranches>().AddNewAsync(userBranches);
+                        });
                     }
+                    await _unitOfWork.Repository<UserBranches>().AddRangeAsync(userBranches);
                     await _unitOfWork.CommitAsync();
                     var addedUser = await _unitOfWork.Repository<AppUser>().GetByIdAsDtoAsync<GetUserByIdDTO>(userToAdd.Id);
 

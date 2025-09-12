@@ -196,7 +196,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserBranches");
+                    b.ToTable("UserBranches", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.Branch", b =>
@@ -258,7 +258,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("LastUpdatedById");
 
-                    b.ToTable("Branches");
+                    b.ToTable("Branches", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.Category", b =>
@@ -302,7 +302,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("LastUpdatedById");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.Customer", b =>
@@ -356,7 +356,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("LastUpdatedById");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.Department", b =>
@@ -399,7 +399,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("LastUpdatedById");
 
-                    b.ToTable("Departments");
+                    b.ToTable("Departments", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.Employee", b =>
@@ -478,7 +478,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("LastUpdatedById");
 
-                    b.ToTable("Employees");
+                    b.ToTable("Employees", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.GoodsReceipt", b =>
@@ -529,7 +529,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("ReceivedById");
 
-                    b.ToTable("GoodsReceipts");
+                    b.ToTable("GoodsReceipts", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.GoodsReceiptLine", b =>
@@ -558,7 +558,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("GoodsReceiptLines");
+                    b.ToTable("GoodsReceiptLines", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.Invoice", b =>
@@ -608,7 +608,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("SalesOrderId");
 
-                    b.ToTable("Invoices");
+                    b.ToTable("Invoices", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.Payment", b =>
@@ -658,7 +658,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("LastUpdatedById");
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.Product", b =>
@@ -732,7 +732,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("LastUpdatedById");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.PurchaseOrder", b =>
@@ -782,7 +782,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("PurchaseOrders");
+                    b.ToTable("PurchaseOrders", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.PurchaseOrderLine", b =>
@@ -814,7 +814,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("PurchaseOrderId");
 
-                    b.ToTable("PurchaseOrderLines");
+                    b.ToTable("PurchaseOrderLines", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.RefreshToken", b =>
@@ -847,7 +847,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshToken");
+                    b.ToTable("RefreshToken", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.SalesOrder", b =>
@@ -897,7 +897,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("LastUpdatedById");
 
-                    b.ToTable("SalesOrders");
+                    b.ToTable("SalesOrders", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.SalesOrderLine", b =>
@@ -934,7 +934,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("SalesOrderLines");
+                    b.ToTable("SalesOrderLines", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.Stock", b =>
@@ -992,7 +992,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("Stocks");
+                    b.ToTable("Stocks", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.StockMovement", b =>
@@ -1040,7 +1040,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("StockMovements");
+                    b.ToTable("StockMovements", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.Supplier", b =>
@@ -1091,7 +1091,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("LastUpdatedById");
 
-                    b.ToTable("Suppliers");
+                    b.ToTable("Suppliers", (string)null);
                 });
 
             modelBuilder.Entity("ERPSystem.Domain.Entities.Warehouse", b =>
@@ -1140,7 +1140,7 @@ namespace ERPSystem.Infrastructure.Migrations
 
                     b.HasIndex("LastUpdatedById");
 
-                    b.ToTable("Warehouses");
+                    b.ToTable("Warehouses", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>

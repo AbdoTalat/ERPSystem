@@ -17,6 +17,10 @@ namespace ERPSystem.Infrastructure.Configuration
                 .HasMaxLength(50)
                 .IsRequired();
 
+            builder.Property(e => e.Price)
+               .HasColumnType("decimal(18,2)")
+               .IsRequired();
+
             builder.Property(p => p.Description)
                 .HasMaxLength(500)
                 .IsRequired();

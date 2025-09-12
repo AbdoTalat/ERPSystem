@@ -41,7 +41,7 @@ namespace ERPSystem.Application.Services.PurchaseOrderService
             {
                 return ApiResponseHelper<GetPurchaseOrderDTO>.ResponseSuccess(data:po);
             }
-            return ApiResponseHelper<GetPurchaseOrderDTO>.ResponseFailure(StatusCodes.NOT_FOUND, $"Purchase Orcer not found with ID: {Id}");
+            return ApiResponseHelper<GetPurchaseOrderDTO>.ResponseFailure(StatusCodes.NOT_FOUND, $"Purchase Order not found with ID: {Id}");
         }
         public async Task<ApiResponseHelper<IEnumerable<GetPurchaseOrderDTO>>> GetPurchaseOrdersBySupplierIdAsync(int SupplierId)
         {
@@ -113,7 +113,6 @@ namespace ERPSystem.Application.Services.PurchaseOrderService
                 _unitOfWork.Repository<PurchaseOrderLine>().DeleteRange(poLines);
 
                 _mapper.Map(dto, oldPurchaseOrder);
-
                 oldPurchaseOrder.TotalAmount = oldPurchaseOrder.PurchaseOrderLines.Sum(l => l.LineTotal);
 
                 _unitOfWork.Repository<PurchaseOrder>().Update(oldPurchaseOrder);
@@ -153,14 +152,20 @@ namespace ERPSystem.Application.Services.PurchaseOrderService
 
             if (purchaseOrder.Status != PurchaseOrderStatus.Pending && purchaseOrder.Status != PurchaseOrderStatus.Approved)
                 return ApiResponseHelper<GetPurchaseOrderDTO>.ResponseFailure(StatusCodes.BAD_REQUEST, "Only Pending or Approved Purchase Orders can be Cancelled.");
+            try
+            {
+                purchaseOrder.Status = PurchaseOrderStatus.Cancelled;
+                _unitOfWork.Repository<PurchaseOrder>().Update(purchaseOrder);
+                await _unitOfWork.CommitAsync();
 
-            purchaseOrder.Status = PurchaseOrderStatus.Cancelled;
-            _unitOfWork.Repository<PurchaseOrder>().Update(purchaseOrder);
-            await _unitOfWork.CommitAsync();
+                var dto = await _unitOfWork.Repository<PurchaseOrder>().GetByIdAsDtoAsync<GetPurchaseOrderDTO>(purchaseOrder.Id);
 
-            var dto = await _unitOfWork.Repository<PurchaseOrder>().GetByIdAsDtoAsync<GetPurchaseOrderDTO>(purchaseOrder.Id);
-
-            return ApiResponseHelper<GetPurchaseOrderDTO>.ResponseSuccess(StatusCodes.OK, "Purchase Order approved.", dto);
+                return ApiResponseHelper<GetPurchaseOrderDTO>.ResponseSuccess(StatusCodes.OK, "Purchase Order approved.", dto);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponseHelper<GetPurchaseOrderDTO>.ResponseFailure(StatusCodes.INTERNAL_SERVER_ERROR, ex.Message);
+            }
         }
     }
 }

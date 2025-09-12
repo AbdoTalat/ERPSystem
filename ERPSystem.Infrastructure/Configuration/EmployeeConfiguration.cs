@@ -17,6 +17,10 @@ namespace ERPSystem.Infrastructure.Configuration
                 .HasMaxLength(50)
                 .IsRequired();
 
+            builder.Property(e => e.Salary)
+               .HasColumnType("decimal(18,2)")
+               .IsRequired();
+
             builder.Property(e => e.PhoneNumber)
                 .HasMaxLength(20)
                 .IsRequired();

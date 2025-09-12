@@ -57,16 +57,14 @@ namespace ERPSystem.Application.Services.GoodsReceiptService
                 };
 
                 var productIds = dto.Lines.Select(l => l.ProductId).ToList();
-                var products = await _unitOfWork.Repository<Product>()
-                    .GetAllAsync(p => productIds.Contains(p.Id));
+                var products = await _unitOfWork.Repository<Product>().GetAllAsync(p => productIds.Contains(p.Id));
 
-                var poLineLookup = po.PurchaseOrderLines.ToDictionary(l => l.ProductId);
+                var poLineDict = po.PurchaseOrderLines.ToDictionary(l => l.ProductId);
 
                 foreach (var line in dto.Lines)
                 {
-                    if (!poLineLookup.TryGetValue(line.ProductId, out var poLine))
-                        return ApiResponseHelper<GetGoodsReceiptDTO>.ResponseFailure(
-                            StatusCodes.BAD_REQUEST,
+                    if (!poLineDict.TryGetValue(line.ProductId, out var poLine))
+                        return ApiResponseHelper<GetGoodsReceiptDTO>.ResponseFailure(StatusCodes.BAD_REQUEST,
                             $"Product Id: {line.ProductId} not in Purchase Order.");
 
                     var grLine = new GoodsReceiptLine
@@ -91,7 +89,6 @@ namespace ERPSystem.Application.Services.GoodsReceiptService
                         Quantity = line.ReceivedQuantity,
                         Reason = $"Goods Receipt for Purchase Order #{po.Id}"
                     };
-
 
                     await _stockService.IncreaseStockByIdAsync(userId, increaseDto, IsCommit: false);
                 }

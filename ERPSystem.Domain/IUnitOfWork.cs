@@ -13,5 +13,10 @@ namespace ERPSystem.Domain
 		Task<int> CommitAsync(CancellationToken cancellationToken = default);
 		Task<int> CommitAsync(bool skipAuditFields, CancellationToken cancellationToken = default);
 
-	}
+		//Task BeginTransactionAsync();
+		//Task CommitTransactionAsync();
+		//Task RollbackTransactionAsync();
+
+
+    }
 }

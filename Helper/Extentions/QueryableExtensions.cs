@@ -19,8 +19,9 @@ namespace Helper.Extentions
                 return query;
 
             var branchId = BranchContext.CurrentBranchId;
+
             if (!branchId.HasValue)
-                return query;
+                return query.Where(_ => false);
 
             var propertyInfo = typeof(T).GetProperty("BranchId", BindingFlags.Public | BindingFlags.Instance);
             if (propertyInfo == null || propertyInfo.PropertyType != typeof(int))
