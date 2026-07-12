@@ -12,13 +12,11 @@ namespace ERPSystem.Domain
 	{
 		Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false, params Expression<Func<T, object>>[] includes);
 		Task<IEnumerable<TDto>> GetAllAsDtoAsync<TDto>(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false) where TDto : class;
-		Task<TDto?> GetByIdAsDtoAsync<TDto>(int id, Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false) where TDto : class;
 		Task<T?> GetByIdAsync(int id, Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false, params Expression<Func<T, object>>[] includes);
+		Task<TDto?> GetByIdAsDtoAsync<TDto>(int id, Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false) where TDto : class;
 		Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false, params Expression<Func<T, object>>[] includes);
         Task<TDto?> FirstOrDefaultAsDtoAsync<TDto>(Expression<Func<T, bool>>? predicate = null, bool skipBranchFilter = false) where TDto : class;
         
-
-
         Task AddNewAsync(T entity);
 		Task AddRangeAsync(IEnumerable<T> entities);
 
@@ -28,7 +26,6 @@ namespace ERPSystem.Domain
 		void Delete(T entity);
 		void DeleteRange(IEnumerable<T> entities);
 
-
-		Task<bool> IsExistsAsync(Expression<Func<T, bool>> predicate, bool skipBranchFilter = false);
+		Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, bool skipBranchFilter = false);
     }
 }

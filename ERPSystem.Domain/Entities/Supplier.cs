@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ERPSystem.Domain.Entities
 {
-    public class Supplier : BaseEntity, IHasBranch
+    public class Supplier : BaseEntity, IHasBranch, IHasTenant
     {
         public string Name { get; set; } 
         public string? Email { get; set; }
@@ -16,6 +16,9 @@ namespace ERPSystem.Domain.Entities
 
         public int BranchId { get; set; }
         public Branch? Branch { get; set; }
+        public Guid TenantId { get; set; }
+        public Tenant? Tenant { get; set; }
+
         public ICollection<PurchaseOrder> PurchaseOrders { get; set; } = new List<PurchaseOrder>();
     }
 }

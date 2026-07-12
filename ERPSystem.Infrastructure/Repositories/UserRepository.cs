@@ -33,7 +33,7 @@ namespace ERPSystem.Infrastructure.Repositories
 				.Select(ub => new
 				{
 					ub.Branch.Name,
-					ub.IsDefaultBranch
+					ub.IsDefault
 				})
 				.ToListAsync();
 
@@ -44,7 +44,7 @@ namespace ERPSystem.Infrastructure.Repositories
 				})
 				.ToList();
 
-			var defaultBranch = userBranches.FirstOrDefault(x => x.IsDefaultBranch);
+			var defaultBranch = userBranches.FirstOrDefault(x => x.IsDefault);
 
 			var dto = new GetUserBranchesDTO
 			{

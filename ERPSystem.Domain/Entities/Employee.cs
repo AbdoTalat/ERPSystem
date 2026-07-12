@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ERPSystem.Domain.Entities
 {
-    public class Employee : BaseEntity, IHasBranch
+    public class Employee : BaseEntity, IHasBranch, IHasTenant
     {
         public string FullName { get; set; }
         public string PhoneNumber { get; set; }
@@ -26,6 +26,8 @@ namespace ERPSystem.Domain.Entities
 
         public int BranchId { get; set; }
         public Branch? Branch { get; set; }
+        public Guid TenantId { get; set; }
+        public Tenant? Tenant { get; set; }
 
         public ICollection<GoodsReceipt> GoodsReceipts { get; set; } = new HashSet<GoodsReceipt>();
     }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ERPSystem.Domain.Entities
 {
-    public class PurchaseOrder : BaseEntity, IHasBranch
+    public class PurchaseOrder : BaseEntity, IHasBranch, IHasTenant
     {
         public DateTime OrderDate { get; set; }
         public PurchaseOrderStatus Status { get; set; }
@@ -19,6 +19,8 @@ namespace ERPSystem.Domain.Entities
 
         public int BranchId { get; set; }
         public Branch? Branch { get; set; }
+        public Guid TenantId { get; set; }
+        public Tenant? Tenant { get; set; }
 
         public ICollection<PurchaseOrderLine> PurchaseOrderLines { get; set; } = new List<PurchaseOrderLine>();
         public ICollection<GoodsReceipt> GoodsReceipts { get; set; } = new List<GoodsReceipt>();

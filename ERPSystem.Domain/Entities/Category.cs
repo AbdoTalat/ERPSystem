@@ -7,13 +7,15 @@ using ERPSystem.Domain.Common;
 
 namespace ERPSystem.Domain.Entities
 {
-    public class Category : BaseEntity, IHasBranch
+    public class Category : BaseEntity, IHasBranch, IHasTenant
     {
         public string Name { get; set; }
         public string Description { get; set; }
 
         public int BranchId { get; set; }
         public Branch? Branch { get; set; }
+        public Guid TenantId { get; set; }
+        public Tenant? Tenant { get; set; }
 
         public ICollection<Product> Products { get; set; } = new HashSet<Product>();
     }

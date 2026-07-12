@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ERPSystem.Application.IRepository;
 using Helper.API;
 using Helper.Constants;
 using AutoMapper;
 using ERPSystem.Domain.Entities;
 using ERPSystem.Application.DTOs.Branch;
+using ERPSystem.Application.IRepository;
 
 namespace ERPSystem.Application.Services.BranchManagement
 {

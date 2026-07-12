@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ERPSystem.Domain;
-using ERPSystem.Application.IRepository;
 using ERPSystem.Infrastructure.Repositories;
 using ERPSystem.Domain.Entities.Auth;
 using ERPSystem.Infrastructure.Seed;
@@ -11,11 +10,13 @@ using HotelApp.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using ERPSystem.Application.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using ERPSystem.Infrastructure.UnitOfWorks;
+using ERPSystem.Application.IRepository;
 
 
 namespace ERPSystem.Infrastructure
 {
-    public static class DependencyInjection
+    public static class DependencyInjectionRegister
 	{
 		public static IServiceCollection AddInfrastructureDI(this IServiceCollection services,
 			IConfiguration configuration, IPermissionLoader permissionLoader)

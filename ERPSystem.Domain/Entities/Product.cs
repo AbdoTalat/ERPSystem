@@ -7,7 +7,7 @@ using ERPSystem.Domain.Common;
 
 namespace ERPSystem.Domain.Entities
 {
-    public class Product : BaseEntity, IHasBranch
+    public class Product : BaseEntity, IHasBranch, IHasTenant
     {
         public string Name { get; set; }
         public string Description { get; set; }
@@ -24,6 +24,8 @@ namespace ERPSystem.Domain.Entities
 
         public int BranchId { get; set; }
         public Branch? Branch { get; set; }
+        public Guid TenantId { get; set; }
+        public Tenant? Tenant { get; set; }
 
         public ICollection<Stock> Stocks { get; set; } = new HashSet<Stock>();
         public ICollection<PurchaseOrderLine> PurchaseOrderLines { get; set; } = new List<PurchaseOrderLine>();

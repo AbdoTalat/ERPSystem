@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ERPSystem.Domain.Entities
 {
-    public class Invoice : BaseEntity, IHasBranch
+    public class Invoice : BaseEntity, IHasBranch, IHasTenant
     {
         public DateTime InvoiceDate { get; set; }
         public decimal TotalAmount { get; set; }
@@ -19,6 +19,8 @@ namespace ERPSystem.Domain.Entities
 
         public int BranchId { get; set; }
         public Branch? Branch { get; set; }
+        public Guid TenantId { get; set; }
+        public Tenant? Tenant { get; set; }
 
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
     }

@@ -33,6 +33,13 @@ namespace ERPSystem.Infrastructure.Configuration
                .WithMany(p => p.SalesOrderLines)
                .HasForeignKey(sol => sol.WarehouseId)
                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(x => x.TenantId);
+
+            builder.HasOne(b => b.Tenant)
+                .WithMany()
+                .HasForeignKey(b => b.TenantId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 

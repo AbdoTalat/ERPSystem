@@ -21,11 +21,6 @@ namespace ERPSystem.Infrastructure.Configuration
                 .HasMaxLength(20)
                 .IsRequired();
 
-            builder.HasOne(u => u.DefaultBranch)
-              .WithMany()
-              .HasForeignKey(u => u.DefaultBranchId)
-              .OnDelete(DeleteBehavior.Restrict);
-
             builder.HasOne(b => b.CreatedBy)
                 .WithMany()
                 .HasForeignKey(b => b.CreatedById)
@@ -35,6 +30,19 @@ namespace ERPSystem.Infrastructure.Configuration
                 .WithMany()
                 .HasForeignKey(b => b.LastUpdatedById)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            //builder.HasIndex(x => x.TenantId);
+
+            builder.HasOne(b => b.Tenant)
+                .WithMany(u => u.Users)
+                .HasForeignKey(b => b.TenantId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(x => new { x.TenantId, x.NormalizedUserName })
+                .IsUnique();
+
+            builder.HasIndex(r => r.NormalizedUserName)
+                .IsUnique(false);
         }
     }
 }

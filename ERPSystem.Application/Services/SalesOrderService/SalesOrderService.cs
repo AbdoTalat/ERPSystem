@@ -59,7 +59,7 @@ namespace ERPSystem.Application.Services.SalesOrderService
         }
         public async Task<ApiResponseHelper<GetSalesOrderDTO>> AddSalesOrderAsync(SalesOrderDTO dto)
         {
-            var isCustomerExist = await _unitOfWork.Repository<Customer>().IsExistsAsync(c => c.Id == dto.CustomerId && c.IsActive);
+            var isCustomerExist = await _unitOfWork.Repository<Customer>().AnyAsync(c => c.Id == dto.CustomerId && c.IsActive);
             if (!isCustomerExist)
                 return ApiResponseHelper<GetSalesOrderDTO>.ResponseFailure(StatusCodes.NOT_FOUND, $"Customer not found or not active.");
             
@@ -222,7 +222,7 @@ namespace ERPSystem.Application.Services.SalesOrderService
                         Quantity = line.Quantity,
                         Reason = $"Sales Order #{so.Id}"
                     };
-                    var result = await _stockService.DecreaseStockByIdAsync(userId, decreaseDto, IsCommit: false);
+                    var result = await _stockService.DecreaseStockByIdAsync(decreaseDto, IsCommit: false);
                     if (!result.Success)
                         return ApiResponseHelper<GetSalesOrderDTO>.ResponseFailure(result.StatusCode, result.Message);
                 }

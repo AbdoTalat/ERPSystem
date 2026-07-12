@@ -1,11 +1,12 @@
 ﻿using ERPSystem.Application.DTOs.Account;
 using ERPSystem.Application.Services.TokenService;
-using ERPSystem.Domain.Entities;
 using ERPSystem.Domain;
+using ERPSystem.Domain.Entities;
 using ERPSystem.Domain.Entities.Auth;
 using Helper.API;
 using Helper.Constants;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,9 @@ namespace ERPSystem.Application.Services.AccountService
         private readonly ITokenService _tokenService;
         private readonly IUnitOfWork _unitOfWork;
 
-        public AccountService(UserManager<AppUser> userManager, ITokenService tokenService, IUnitOfWork unitOfWork)
+        public AccountService(UserManager<AppUser> userManager,
+            ITokenService tokenService,
+            IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _tokenService = tokenService;
@@ -29,7 +32,11 @@ namespace ERPSystem.Application.Services.AccountService
 
         public async Task<ApiResponseHelper<LoginResultDTO>> LoginAsync(LoginDTO loginDTO)
         {
-            var user = await _userManager.FindByEmailAsync(loginDTO.Email);
+            var user = await _userManager.Users
+                .IgnoreQueryFilters()
+                .SingleOrDefaultAsync(x =>
+                    x.NormalizedEmail == loginDTO.Email.ToUpper());
+            //var user = await _userManager.FindByEmailAsync(loginDTO.Email);
             if (user == null)
                 return ApiResponseHelper<LoginResultDTO>.ResponseFailure(StatusCodes.NOT_FOUND, "Invalid email address.");
 

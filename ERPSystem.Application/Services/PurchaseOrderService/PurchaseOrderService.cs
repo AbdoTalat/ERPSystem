@@ -10,9 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ERPSystem.Application.IRepository;
 using ERPSystem.Application.DTOs.GoodsReceipt;
 using ERPSystem.Application.DTOs.Product;
+using ERPSystem.Application.IRepository;
 
 namespace ERPSystem.Application.Services.PurchaseOrderService
 {

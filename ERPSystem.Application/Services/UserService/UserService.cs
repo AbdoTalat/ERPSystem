@@ -82,13 +82,14 @@ namespace ERPSystem.Application.Services.UserService
 
                 if (result.Succeeded)
                 {
+                    var defaultBranchId = userDTO.BranchIds.First();
                     foreach (var branchId in userDTO.BranchIds)
                     {
                         userBranches.Add(new UserBranches
                         {
                             BranchId = branchId,
                             UserId = userToAdd.Id,
-                            IsDefaultBranch = branchId == userDTO.DefaultBranchId
+                            IsDefault = branchId == defaultBranchId
                         });
                     }
                     await _unitOfWork.Repository<UserBranches>().AddRangeAsync(userBranches);
@@ -202,27 +203,48 @@ namespace ERPSystem.Application.Services.UserService
                 return ApiResponseHelper<string>.ResponseFailure(StatusCodes.BAD_REQUEST, ex.Message);
             }
         }
-        public async Task<ApiResponseHelper<object>> ChangeDefaultBranch( int userId, int branchId)
+        public async Task<ApiResponseHelper<string>> ChangeDefaultBranch( int userId, int branchId)
         {
-            bool IsBrachExist = await _unitOfWork.Repository<Branch>().IsExistsAsync(b => b.Id == branchId);
+            bool IsBrachExist = await _unitOfWork.Repository<Branch>().AnyAsync(b => b.Id == branchId);
             if (!IsBrachExist)
             {
-                return ApiResponseHelper<object>.ResponseFailure(StatusCodes.NOT_FOUND, $"Branch not found with this ID: {branchId}");
+                return ApiResponseHelper<string>.ResponseFailure(StatusCodes.NOT_FOUND, $"Branch not found with this ID: {branchId}");
             }
 
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null)
+            bool IsUserExist = await _unitOfWork.Repository<AppUser>().AnyAsync(u => u.Id == userId);
+            if (!IsUserExist)
             {
-                return ApiResponseHelper<object>.ResponseFailure(StatusCodes.NOT_FOUND, $"user not found with this ID: {userId}");
+                return ApiResponseHelper<string>.ResponseFailure(StatusCodes.NOT_FOUND, $"user not found with this ID: {userId}");
             }
 
-            user.DefaultBranchId = branchId;
-            var result = await _userManager.UpdateAsync(user);
-            if (result.Succeeded)
+            var userBranches = await _unitOfWork.Repository<UserBranches>().GetAllAsync(b => b.UserId == userId, SkipBranchFilter: true);
+            if (!userBranches.Any(x => x.BranchId == branchId))
             {
-                return ApiResponseHelper<object>.ResponseSuccess(StatusCodes.OK, "Default branch changed successfully.");
+                return ApiResponseHelper<string>.ResponseFailure(StatusCodes.BAD_REQUEST, "The selected branch does not belong to this user.");
             }
-            return ApiResponseHelper<object>.ResponseFailure(StatusCodes.INTERNAL_SERVER_ERROR, "Could not change the default branch.");
+            try
+            {
+                foreach (var userBranch in userBranches)
+                {
+                    if(userBranch.BranchId == branchId)
+                        userBranch.IsDefault = true;
+                    else
+                        userBranch.IsDefault = false;
+                }
+
+                _unitOfWork.Repository<UserBranches>().UpdateRange(userBranches);
+                await _unitOfWork.CommitAsync();
+
+                var user = await _unitOfWork.Repository<AppUser>().GetByIdAsync(userId);
+                var roles = (List<string>)await _userManager.GetRolesAsync(user);
+                var newToken = await _tokenService.GenerateAccessTokenAsync(user, roles);
+
+                return ApiResponseHelper<string>.ResponseSuccess(message: "Default branch changed successfully.", data: newToken);
+            } 
+            catch (Exception ex)
+            {
+                return ApiResponseHelper<string>.ResponseFailure(StatusCodes.INTERNAL_SERVER_ERROR, ex.Message);
+            }
         }
     }
 }

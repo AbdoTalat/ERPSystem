@@ -30,15 +30,14 @@ namespace ERPSystem.Infrastructure.Configuration
                 .HasForeignKey(i => i.BranchId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(i => i.CreatedBy)
+            builder.HasIndex(x => x.TenantId);
+
+            builder.HasOne(b => b.Tenant)
                 .WithMany()
-                .HasForeignKey(i => i.CreatedById)
+                .HasForeignKey(b => b.TenantId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(i => i.LastUpdatedBy)
-                .WithMany()
-                .HasForeignKey(i => i.LastUpdatedById)
-                .OnDelete(DeleteBehavior.Restrict);
+            AuditableEntityConfiguration.Configure(builder);
         }
     }
 

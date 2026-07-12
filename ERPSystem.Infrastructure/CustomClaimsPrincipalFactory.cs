@@ -33,40 +33,49 @@ namespace HotelApp.Infrastructure
 		protected override async Task<ClaimsIdentity> GenerateClaimsAsync(AppUser user)
 		{
 			var identity = await base.GenerateClaimsAsync(user);
-			var roles = await _userManager.GetRolesAsync(user);
+            var roleIds = await _context.UserRoles
+                .Where(ur => ur.UserId == user.Id)
+                .Select(ur => ur.RoleId)
+                .ToListAsync();
+            var roles = await _context.Roles.IgnoreQueryFilters()
+                .Where(r => roleIds.Contains(r.Id))
+                .Select(r => r.Name)
+                .ToListAsync();
 
-			foreach (var roleName in roles)
-			{
-				var role = await _roleManager.FindByNameAsync(roleName);
-				if (role == null) continue;
-
-				var roleClaims = await _roleManager.GetClaimsAsync(role);
-
-				foreach (var claim in roleClaims.Where(c => c.Type == "Permission"))
-				{
-					identity.AddClaim(claim);
-				}
-			}
-
-            if (user.DefaultBranchId != 0)
+            if (user.TenantId != Guid.Empty)
             {
-                identity.AddClaim(new Claim("DefaultBranchId", user.DefaultBranchId.ToString()));
+                identity.AddClaim(new Claim("TenantId", user.TenantId.ToString()));
+            }
 
-                //var defaultBranchData = await _context.Branches
-                //    .Where(b => b.Id == user.DefaultBranchId)
-                //    .Select(b => new UserBranchesDataDTO
-                //    {
-                //        Id = b.Id,
-                //        Name = b.Name
-                //    })
-                //    .FirstOrDefaultAsync();
+            foreach (var roleName in roles)
+            {
+				var role = await _context.Roles
+                    .IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(r => r.Name == roleName);
 
-                //var defaultBranchJson = JsonConvert.SerializeObject(defaultBranchData);
-                //identity.AddClaim(new Claim("DefaultBranchData", defaultBranchJson));
+				if (role == null) 
+                    continue;
+
+                var permissions = await _roleManager.GetClaimsAsync(role);
+
+                identity.AddClaims(permissions.Where(c => c.Type == "Permission"));
+            }
+
+
+			var DefaultBranchId = _context.UserBranches
+                .IgnoreQueryFilters()
+				.Where(c => c.UserId == user.Id && c.IsDefault == true)
+				.Select(b => b.Id)
+				.FirstOrDefault();
+
+            if (DefaultBranchId != 0)
+            {
+                identity.AddClaim(new Claim("DefaultBranchId", DefaultBranchId.ToString()));
             }
 
             // Add UserBranches Claims
             var userBranchesData = await _context.UserBranches
+				.IgnoreQueryFilters()
 				.Where(ub => ub.UserId == user.Id)
 				.Select(ub => new UserBranchesDataDTO
 				{
@@ -84,5 +93,91 @@ namespace HotelApp.Infrastructure
 			return identity;
 		}
 	}
+    //public class CustomClaimsPrincipalFactory
+    //: UserClaimsPrincipalFactory<AppUser, AppRole>
+    //{
+    //    private readonly UserManager<AppUser> _userManager;
+    //    private readonly AppDbContext _context;
 
+    //    public CustomClaimsPrincipalFactory(
+    //        UserManager<AppUser> userManager,
+    //        RoleManager<AppRole> roleManager,
+    //        IOptions<IdentityOptions> optionsAccessor,
+    //        AppDbContext context)
+    //        : base(userManager, roleManager, optionsAccessor)
+    //    {
+    //        _userManager = userManager;
+    //        _context = context;
+    //    }
+
+    //    protected override async Task<ClaimsIdentity> GenerateClaimsAsync(AppUser user)
+    //    {
+    //        var identity = await base.GenerateClaimsAsync(user);
+
+    //        // =========================
+    //        // 1. BASIC USER CLAIMS
+    //        // =========================
+    //        identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+
+    //        if (user.TenantId != 0)
+    //        {
+    //            identity.AddClaim(new Claim("TenantId", user.TenantId.ToString()));
+    //        }
+
+    //        // =========================
+    //        // 2. PERMISSIONS (OPTIMIZED)
+    //        // =========================
+    //        var roleClaims = await _userManager.GetRolesAsync(user);
+
+    //        foreach (var roleName in roleClaims)
+    //        {
+    //            var permissions = await _roleManager.GetClaimsAsync(
+    //                await _roleManager.FindByNameAsync(roleName)
+    //            );
+
+    //            identity.AddClaims(
+    //                permissions.Where(c => c.Type == "Permission")
+    //            );
+    //        }
+
+    //        // =========================
+    //        // 3. USER BRANCHES (OPTIMIZED)
+    //        // =========================
+    //        var userBranches = await _context.UserBranches
+    //            .Where(x => x.UserId == user.Id)
+    //            .Select(x => new
+    //            {
+    //                x.BranchId,
+    //                x.Branch.Name,
+    //                x.IsDefault
+    //            })
+    //            .ToListAsync();
+
+    //        var defaultBranch = userBranches.FirstOrDefault(x => x.IsDefault);
+
+    //        if (defaultBranch != null)
+    //        {
+    //            identity.AddClaim(new Claim("DefaultBranchId", defaultBranch.BranchId.ToString()));
+    //        }
+
+    //        if (userBranches.Any())
+    //        {
+    //            identity.AddClaim(new Claim(
+    //                "UserBranches",
+    //                string.Join(",", userBranches.Select(x => x.BranchId))
+    //            ));
+
+    //            identity.AddClaim(new Claim(
+    //                "UserBranchesData",
+    //                JsonConvert.SerializeObject(userBranches.Select(x => new
+    //                {
+    //                    x.BranchId,
+    //                    x.Name
+    //                }))
+    //            ));
+    //        }
+
+    //        return identity;
+    //    }
+    //}
 }

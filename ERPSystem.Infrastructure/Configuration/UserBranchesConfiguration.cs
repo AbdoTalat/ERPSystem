@@ -24,6 +24,13 @@ namespace ERPSystem.Infrastructure.Configuration
                 .WithMany(u => u.UserBranches)
                 .HasForeignKey(u => u.BranchId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(x => x.TenantId);
+
+            builder.HasOne(b => b.Tenant)
+                .WithMany()
+                .HasForeignKey(b => b.TenantId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

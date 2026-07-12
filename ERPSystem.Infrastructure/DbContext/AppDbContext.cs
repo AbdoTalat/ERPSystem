@@ -1,4 +1,5 @@
-﻿using ERPSystem.Domain.Common;
+﻿using ERPSystem.Application.Services.UserContext;
+using ERPSystem.Domain.Common;
 using ERPSystem.Domain.Entities;
 using ERPSystem.Domain.Entities.Auth;
 using ERPSystem.Infrastructure.Configuration;
@@ -15,15 +16,13 @@ using System.Threading.Tasks;
 
 namespace ERPSystem.Infrastructure.DbContext
 {
-    public class AppDbContext : IdentityDbContext<AppUser, AppRole, int>
+    public sealed class AppDbContext : IdentityDbContext<AppUser, AppRole, int>
 	{
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        //public AppDbContext() { }
-        public AppDbContext(DbContextOptions options, IHttpContextAccessor httpContextAccessor) 
+        private readonly IUserContext _userContext;
+        public AppDbContext(DbContextOptions options, IUserContext userContext) 
             : base(options)
         {
-            _httpContextAccessor = httpContextAccessor;
+            _userContext = userContext;
         }
 
 		#region DbSets
@@ -51,74 +50,55 @@ namespace ERPSystem.Infrastructure.DbContext
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Payment> Payments { get; set; }
 
+        public DbSet<Tenant> Tenants { get; set; }
+
         #endregion
-
-        #region Overrided SaveChangesAsync Method
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-		{
-			return await SaveChangesAsync(skipAuditFields: false, cancellationToken);
-		}
-
-		public async Task<int> SaveChangesAsync(bool skipAuditFields = false, CancellationToken cancellationToken = default)
-		{
-			if (!skipAuditFields)
-			{
-				var entries = ChangeTracker
-					.Entries<BaseEntity>()
-					.Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
-
-				var now = DateTime.UtcNow;
-
-				// Get userId safely
-				var userIdStr = _httpContextAccessor?.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
-				int? userId = null;
-				if (int.TryParse(userIdStr, out var parsedUserId))
-					userId = parsedUserId;
-
-				foreach (var entry in entries)
-				{
-					if (entry.State == EntityState.Added)
-					{
-						entry.Entity.CreatedDate = now;
-						if (userId.HasValue)
-							entry.Entity.CreatedById = userId.Value;
-					}
-					else if (entry.State == EntityState.Modified)
-					{
-						entry.Entity.LastUpdatedDate = now;
-						if (userId.HasValue)
-							entry.Entity.LastUpdatedById = userId.Value;
-					}
-				}
-			}
-
-			return await base.SaveChangesAsync(cancellationToken);
-		}
-		#endregion
-
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
 			base.OnModelCreating(builder);
 
-			/* Auth Configurations */
-			builder.ApplyConfiguration(new AppUserConfiguration());
-			builder.ApplyConfiguration(new AppRoleConfiguration());
+            #region Query Filters For Multi-Tenancy
+            builder.Entity<Branch>().HasQueryFilter(b => b.TenantId == _userContext.TenantId);
+            builder.Entity<Employee>().HasQueryFilter(e => e.TenantId == _userContext.TenantId);
+            builder.Entity<Department>().HasQueryFilter(d => d.TenantId == _userContext.TenantId);
+            builder.Entity<UserBranches>().HasQueryFilter(ub => ub.TenantId == _userContext.TenantId);
+            builder.Entity<Category>().HasQueryFilter(c => c.TenantId == _userContext.TenantId);
+            builder.Entity<Product>().HasQueryFilter(p => p.TenantId == _userContext.TenantId);
+            builder.Entity<Stock>().HasQueryFilter(s => s.TenantId == _userContext.TenantId);
+            builder.Entity<StockMovement>().HasQueryFilter(sm => sm.TenantId == _userContext.TenantId);
+            builder.Entity<Warehouse>().HasQueryFilter(w => w.TenantId == _userContext.TenantId);
+            builder.Entity<Supplier>().HasQueryFilter(s => s.TenantId == _userContext.TenantId);
+            builder.Entity<PurchaseOrder>().HasQueryFilter(po => po.TenantId == _userContext.TenantId);
+            builder.Entity<GoodsReceipt>().HasQueryFilter(gr => gr.TenantId == _userContext.TenantId);
+            builder.Entity<Customer>().HasQueryFilter(c => c.TenantId == _userContext.TenantId);
+            builder.Entity<SalesOrder>().HasQueryFilter(so => so.TenantId == _userContext.TenantId);
+            builder.Entity<Invoice>().HasQueryFilter(i => i.TenantId == _userContext.TenantId);
+            builder.Entity<Payment>().HasQueryFilter(p => p.TenantId == _userContext.TenantId);
+            builder.Entity<Tenant>().HasQueryFilter(t => t.Id == _userContext.TenantId);
+            builder.Entity<AppUser>().HasQueryFilter(u => u.TenantId == _userContext.TenantId);
+            builder.Entity<AppRole>().HasQueryFilter(r => r.TenantId == _userContext.TenantId);
+            #endregion
 
-			/* HR Configurations */
-			builder.ApplyConfiguration(new EmployeeConfiguration());
-			builder.ApplyConfiguration(new DepartmentConfiguration());
+            #region Configurations
+            /* Auth Configurations */
+            builder.ApplyConfiguration(new AppUserConfiguration());
+            builder.ApplyConfiguration(new AppRoleConfiguration());
+
+            /* HR Configurations */
+            builder.ApplyConfiguration(new EmployeeConfiguration());
+            builder.ApplyConfiguration(new DepartmentConfiguration());
 
             /* Invetory Configurations */
             builder.ApplyConfiguration(new CategoryConfiguration());
             builder.ApplyConfiguration(new ProductConfiguration());
             builder.ApplyConfiguration(new StockConfiguration());
             builder.ApplyConfiguration(new WarehouseConfiguration());
-			builder.ApplyConfiguration(new StockMovementConfiguration());
+            builder.ApplyConfiguration(new StockMovementConfiguration());
 
-			/* Branch Management Configurations */
-			builder.ApplyConfiguration(new UserBranchesConfiguration());
-			builder.ApplyConfiguration(new BranchConfiguration());
+            /* Branch Management Configurations */
+            builder.ApplyConfiguration(new UserBranchesConfiguration());
+            builder.ApplyConfiguration(new BranchConfiguration());
 
             /* Purchasing Configurations */
             builder.ApplyConfiguration(new SupplierConfiguration());
@@ -128,11 +108,17 @@ namespace ERPSystem.Infrastructure.DbContext
             builder.ApplyConfiguration(new GoodsReceiptLineConfiguration());
 
             /* Sales Configuration*/
-			builder.ApplyConfiguration(new CustomerConfiguration());
+            builder.ApplyConfiguration(new CustomerConfiguration());
             builder.ApplyConfiguration(new SalesOrderConfiguration());
             builder.ApplyConfiguration(new SalesOrderLineConfiguration());
             builder.ApplyConfiguration(new InvoiceConfiguration());
             builder.ApplyConfiguration(new PaymentConfiguration());
+
+            /* Tenant Configuration*/
+            builder.ApplyConfiguration(new TenantConfiguration());
+            builder.ApplyConfiguration(new RefreshTokenConfiguration());
+
+            #endregion
         }
     }
 }

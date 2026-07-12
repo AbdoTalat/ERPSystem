@@ -12,7 +12,7 @@ using AutoMapper;
 using Helper.Extentions;
 using Helper.Context;
 
-namespace ERPSystem.Infrastructure
+namespace ERPSystem.Infrastructure.UnitOfWorks
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
 	{
@@ -180,7 +180,7 @@ namespace ERPSystem.Infrastructure
 		#endregion
 
 		#region Other Methods
-		public async Task<bool> IsExistsAsync(Expression<Func<T, bool>> predicate, bool skipBranchFilter = false)
+		public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, bool skipBranchFilter = false)
 		{
 			return await _dbSet
 				.AsNoTracking()

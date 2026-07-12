@@ -14,6 +14,7 @@ using ERPSystem.Application.Services.SalesOrderService;
 using ERPSystem.Application.Services.StockService;
 using ERPSystem.Application.Services.SupplierService;
 using ERPSystem.Application.Services.TokenService;
+using ERPSystem.Application.Services.UserContext;
 using ERPSystem.Application.Services.UserService;
 using ERPSystem.Application.Services.WarehouseService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -25,7 +26,7 @@ using System.Text;
 
 namespace ERPSystem.Application
 {
-    public static class DependencyInjection 
+    public static class DependencyInjectionRegister 
 	{
 		public static IServiceCollection AddApplicationDI(this IServiceCollection services, IConfiguration configuration)
 		{
@@ -48,11 +49,13 @@ namespace ERPSystem.Application
             services.AddScoped<ISalesOrderService, SalesOrderService>();
             services.AddScoped<IInvoiceService, InvoiceService>();
             services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<IUserContext, UserContext>();
 
-			services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            //services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.AddAutoMapper((Action<AutoMapper.IMapperConfigurationExpression>?)null, AppDomain.CurrentDomain.GetAssemblies());
 
 
-			services.AddAuthentication(options =>
+            services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;

@@ -22,7 +22,7 @@ namespace ERPSystem.Infrastructure.Repositories
 		public async Task<int> GetDefaultBranchIdByUserIdAsync(int userId)
 		{
 			var DefualtBranchId = await _context.UserBranches
-				.Where(ub => ub.UserId == userId && ub.IsDefaultBranch)
+				.Where(ub => ub.UserId == userId && ub.IsDefault)
 				.Select(ub => ub.BranchId)
 				.FirstOrDefaultAsync();
 

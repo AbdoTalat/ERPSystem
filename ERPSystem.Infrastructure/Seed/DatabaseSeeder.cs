@@ -40,11 +40,11 @@ namespace ERPSystem.Infrastructure.Seed
 
         public async Task SeedAsync()
         {
-            await _context.SeedFromJsonAsync<Branch>(_env, "Branches.json");
+            //await _context.SeedFromJsonAsync<Branch>(_env, "Branches.json");
 
-            await SeedRolesAsync("Roles.json");
-            await SeedUsersAsync("Users.json");
-            await SeedPermissionsAsync("Permissions.json");
+            //await SeedRolesAsync("Roles.json");
+            //await SeedUsersAsync("Users.json");
+            //await SeedPermissionsAsync("Permissions.json");
         }
         private async Task SeedPermissionsAsync(string fileName)
         {
@@ -77,104 +77,103 @@ namespace ERPSystem.Infrastructure.Seed
                 }
             }
         }
-        private async Task SeedRolesAsync(string fileName)
-        {
-            var solutionRoot = Directory.GetParent(_env.ContentRootPath)?.FullName;
-            var filePath = Path.Combine(solutionRoot!, "ERPSystem.Infrastructure", "Seed", "SeedData", fileName);
+        //private async Task SeedRolesAsync(string fileName)
+        //{
+        //    var solutionRoot = Directory.GetParent(_env.ContentRootPath)?.FullName;
+        //    var filePath = Path.Combine(solutionRoot!, "ERPSystem.Infrastructure", "Seed", "SeedData", fileName);
 
-            if (!File.Exists(filePath)) return;
+        //    if (!File.Exists(filePath)) return;
 
-            var jsonData = await File.ReadAllTextAsync(filePath);
-            var roles = JsonConvert.DeserializeObject<List<AppRole>>(jsonData);
+        //    var jsonData = await File.ReadAllTextAsync(filePath);
+        //    var roles = JsonConvert.DeserializeObject<List<AppRole>>(jsonData);
 
-            if (roles == null) return;
+        //    if (roles == null) return;
 
-            foreach (var role in roles)
-            {
-                if (!await _roleManager.RoleExistsAsync(role.Name))
-                {
-                    await _roleManager.CreateAsync(new AppRole
-                    {
-                        Name = role.Name,
-                        NormalizedName = role.NormalizedName
-                    });
-                }
-            }
-        }
-        private async Task SeedUsersAsync(string fileName)
-        {
-            var solutionRoot = Directory.GetParent(_env.ContentRootPath)?.FullName;
-            var filePath = Path.Combine(solutionRoot!, "ERPSystem.Infrastructure", "Seed", "SeedData", fileName);
 
-            if (!File.Exists(filePath))
-                return;
+        //    foreach (var role in roles)
+        //    {
+        //        if (!await _roleManager.RoleExistsAsync(role.Name))
+        //        {
+        //            await _roleManager.CreateAsync(new AppRole
+        //            {
+        //                Name = role.Name,
+        //                NormalizedName = role.NormalizedName
+        //            });
+        //        }
+        //    }
+        //}
+        //private async Task SeedUsersAsync(string fileName)
+        //{
+        //    var solutionRoot = Directory.GetParent(_env.ContentRootPath)?.FullName;
+        //    var filePath = Path.Combine(solutionRoot!, "ERPSystem.Infrastructure", "Seed", "SeedData", fileName);
 
-            var jsonData = await File.ReadAllTextAsync(filePath);
-            var users = JsonConvert.DeserializeObject<List<UserSeedModel>>(jsonData);
+        //    if (!File.Exists(filePath))
+        //        return;
 
-            if (users == null) 
-                return;
+        //    var jsonData = await File.ReadAllTextAsync(filePath);
+        //    var users = JsonConvert.DeserializeObject<List<UserSeedModel>>(jsonData);
 
-            foreach (var userSeed in users)
-            {
-                var user = await _userManager.FindByNameAsync(userSeed.UserName);
+        //    if (users == null) 
+        //        return;
 
-                if (user == null)
-                {
-                    user = new AppUser
-                    {
-                        FirstName = userSeed.FirstName,
-                        LastName = userSeed.LastName,
-                        UserName = userSeed.UserName,
-                        Email = userSeed.Email,
-                        EmailConfirmed = userSeed.EmailConfirmed,
-                        IsActive = userSeed.IsActive
-                    };
+        //    foreach (var userSeed in users)
+        //    {
+        //        var user = await _userManager.FindByNameAsync(userSeed.UserName);
 
-                    var result = await _userManager.CreateAsync(user, userSeed.Password);
+        //        if (user == null)
+        //        {
+        //            user = new AppUser
+        //            {
+        //                FirstName = userSeed.FirstName,
+        //                LastName = userSeed.LastName,
+        //                UserName = userSeed.UserName,
+        //                Email = userSeed.Email,
+        //                EmailConfirmed = userSeed.EmailConfirmed,
+        //                IsActive = userSeed.IsActive
+        //            };
 
-                    if (result.Succeeded)
-                    {
-                        foreach (var roleName in userSeed.Roles)
-                        {
-                            if (await _roleManager.RoleExistsAsync(roleName))
-                            {
-                                await _userManager.AddToRoleAsync(user, roleName);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        throw new Exception($"Failed to create user {userSeed.UserName}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-                    }
-                }
+        //            var result = await _userManager.CreateAsync(user, userSeed.Password);
 
-                var allBranches = await _context.Branches.ToListAsync();
-                foreach (var branch in allBranches)
-                {
-                    var exists = await _context.UserBranches
-                        .AnyAsync(ub => ub.UserId == user.Id && ub.BranchId == branch.Id);
+        //            if (result.Succeeded)
+        //            {
+        //                foreach (var roleName in userSeed.Roles)
+        //                {
+        //                    if (await _roleManager.RoleExistsAsync(roleName))
+        //                    {
+        //                        await _userManager.AddToRoleAsync(user, roleName);
+        //                    }
+        //                }
+        //            }
+        //            else
+        //            {
+        //                throw new Exception($"Failed to create user {userSeed.UserName}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        //            }
+        //        }
 
-                    if (!exists)
-                    {
-                        await _context.UserBranches.AddAsync(new UserBranches
-                        {
-                            UserId = user.Id,
-                            BranchId = branch.Id
-                        });
-                    }
-                }
+        //        var allBranches = await _context.Branches.ToListAsync();
+        //        foreach (var branch in allBranches)
+        //        {
+        //            var exists = await _context.UserBranches
+        //                .AnyAsync(ub => ub.UserId == user.Id && ub.BranchId == branch.Id);
 
-                if (user.DefaultBranchId == null && allBranches.Any())
-                {
-                    user.DefaultBranchId = allBranches.First().Id;
-                    _context.Users.Update(user);
-                }
+        //            if (!exists)
+        //            {
+        //                var defaultBranch = allBranches.First();
+        //                await _context.UserBranches.AddAsync(new UserBranches
+        //                {
+        //                    UserId = user.Id,
+        //                    BranchId = branch.Id,
+        //                    IsDefault = branch.Id == defaultBranch.Id
+        //                });
+        //            }
+        //        }
 
-                await _context.SaveChangesAsync();
-            }
+                
 
-        }
+        //        await _context.SaveChangesAsync();
+        //    }
+
+        //}
 
         public class UserSeedModel
         {

@@ -1,8 +1,11 @@
 ﻿using ERPSystem.Application.DTOs.AppUser;
+using ERPSystem.Application.Services.TokenService;
 using ERPSystem.Application.Services.UserService;
+using ERPSystem.Domain.Entities.Auth;
 using Helper.Extentions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -13,10 +16,17 @@ namespace ERPSystem.API.Controllers
     public class UserController : BaseController
     {
         private readonly IUserService _userService;
+        private readonly ITokenService _tokenService;
+        private readonly UserManager<AppUser> _userManager;
 
-        public UserController(IUserService userService)
+        public UserController(
+            IUserService userService,
+            ITokenService tokenService,
+            UserManager<AppUser> userManager)
         {
             _userService = userService;
+            _tokenService = tokenService;
+            _userManager = userManager;
         }
 
         [HttpGet]

@@ -15,9 +15,9 @@ namespace ERPSystem.Application.Services.StockService
         Task<ApiResponseHelper<IEnumerable<GetStockDTO>>> GetStockByProductAndWarehouseAsync(int warehouseId , int productId);
         Task<ApiResponseHelper<IEnumerable<GetStockByWarehouseDTO>>> GetStockByWarehouseAsync(int warehouseId);
         Task<ApiResponseHelper<GetStockDTO>> AddStockAsync(AddStockDTO dto);
-        Task<ApiResponseHelper<GetStockDTO>> IncreaseStockByIdAsync(int userId, IncreaseStockDTO dto, bool IsCommit = true);
-        Task<ApiResponseHelper<GetStockDTO>> DecreaseStockByIdAsync(int userId, DecreaseStockDTO dto, bool IsCommit = true);
-        Task<ApiResponseHelper<object>> TransferStockAsync(int userId, TransferStockDTO dto);
+        Task<ApiResponseHelper<GetStockDTO>> IncreaseStockByIdAsync(IncreaseStockDTO dto, bool IsCommit = true);
+        Task<ApiResponseHelper<GetStockDTO>> DecreaseStockByIdAsync(DecreaseStockDTO dto, bool IsCommit = true);
+        Task<ApiResponseHelper<object>> TransferStockAsync(TransferStockDTO dto);
         Task<ApiResponseHelper<object>> DeleteStockByIdAsync(int Id);
     }
 }

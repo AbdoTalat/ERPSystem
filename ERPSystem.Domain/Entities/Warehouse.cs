@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ERPSystem.Domain.Entities
 {
-    public class Warehouse : BaseEntity, IHasBranch
+    public class Warehouse : BaseEntity, IHasBranch, IHasTenant
     {
         public string Name { get; set; }
         public string Location { get; set; }
@@ -15,6 +15,8 @@ namespace ERPSystem.Domain.Entities
 
         public int BranchId { get; set; }
         public Branch? Branch { get; set; }
+        public Guid TenantId { get; set; }
+        public Tenant? Tenant { get; set; }
 
         public ICollection<Stock> Stocks { get; set; } = new HashSet<Stock>();
         public ICollection<SalesOrderLine> SalesOrderLines { get; set; } = new HashSet<SalesOrderLine>();

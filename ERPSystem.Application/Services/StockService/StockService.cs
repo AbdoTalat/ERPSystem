@@ -79,7 +79,7 @@ namespace ERPSystem.Application.Services.StockService
                     .ResponseFailure(StatusCodes.INTERNAL_SERVER_ERROR, ex.InnerException.Message);
             }
         }
-        public async Task<ApiResponseHelper<GetStockDTO>> IncreaseStockByIdAsync(int userId, IncreaseStockDTO dto, bool IsCommit = true)
+        public async Task<ApiResponseHelper<GetStockDTO>> IncreaseStockByIdAsync(IncreaseStockDTO dto, bool IsCommit = true)
         {
             if (dto.Quantity <= 0)
                 return ApiResponseHelper<GetStockDTO>.ResponseFailure(StatusCodes.BAD_REQUEST, "Quantity must be greater than zero.");
@@ -107,8 +107,7 @@ namespace ERPSystem.Application.Services.StockService
                     ProductId = dto.ProductId,
                     WarehouseId = dto.WarehouseId,
                     Quantity = dto.Quantity,
-                    Reason = dto.Reason,
-                    UserId = userId
+                    Reason = dto.Reason
                 };
 
                 await _unitOfWork.Repository<StockMovement>().AddNewAsync(stockMovement);
@@ -125,7 +124,7 @@ namespace ERPSystem.Application.Services.StockService
                 return ApiResponseHelper<GetStockDTO>.ResponseFailure(StatusCodes.INTERNAL_SERVER_ERROR, ex.Message);
             }
         }
-        public async Task<ApiResponseHelper<GetStockDTO>> DecreaseStockByIdAsync(int userId, DecreaseStockDTO dto, bool IsCommit = true)
+        public async Task<ApiResponseHelper<GetStockDTO>> DecreaseStockByIdAsync(DecreaseStockDTO dto, bool IsCommit = true)
         {
             try
             {
@@ -152,7 +151,6 @@ namespace ERPSystem.Application.Services.StockService
 
                 stockMovement.Quantity = -dto.Quantity;
                 stockMovement.StockId = stock.Id;
-                stockMovement.UserId = userId;
                 stockMovement.ProductId = stock.ProductId;
                 stockMovement.WarehouseId = stock.WarehouseId;
 
@@ -169,7 +167,7 @@ namespace ERPSystem.Application.Services.StockService
                 return ApiResponseHelper<GetStockDTO>.ResponseFailure(StatusCodes.INTERNAL_SERVER_ERROR, ex.Message);
             }
         }
-        public async Task<ApiResponseHelper<object>> TransferStockAsync(int userId, TransferStockDTO dto)
+        public async Task<ApiResponseHelper<object>> TransferStockAsync(TransferStockDTO dto)
         {
             if (dto.FromWarehouseId == dto.ToWarehouseId)
                 return ApiResponseHelper<object>.ResponseFailure(StatusCodes.BAD_REQUEST, "Source and target warehouse cannot be the same.");
@@ -179,7 +177,7 @@ namespace ERPSystem.Application.Services.StockService
             if (sourceStock == null)
                 return ApiResponseHelper<object>.ResponseFailure(StatusCodes.NOT_FOUND, "Stock not found.");
             
-            var IsWarehouseExist = await _unitOfWork.Repository<Warehouse>().IsExistsAsync(w => w.Id == dto.ToWarehouseId);
+            var IsWarehouseExist = await _unitOfWork.Repository<Warehouse>().AnyAsync(w => w.Id == dto.ToWarehouseId);
             if (!IsWarehouseExist)
                 return ApiResponseHelper<object>.ResponseFailure(StatusCodes.NOT_FOUND, "Warehouse not found.");
             
@@ -219,8 +217,7 @@ namespace ERPSystem.Application.Services.StockService
                     ProductId = sourceStock.ProductId,
                     WarehouseId = sourceStock.WarehouseId,
                     Quantity = -dto.Quantity,
-                    Reason = "Transfer Out",
-                    UserId = userId
+                    Reason = "Transfer Out"
                 });
 
                 await _unitOfWork.Repository<StockMovement>().AddNewAsync(new StockMovement
@@ -229,8 +226,7 @@ namespace ERPSystem.Application.Services.StockService
                     ProductId = targetStock.ProductId,
                     WarehouseId = targetStock.WarehouseId,
                     Quantity = dto.Quantity,
-                    Reason = "Transfer In",
-                    UserId = userId
+                    Reason = "Transfer In"
                 });
 
 

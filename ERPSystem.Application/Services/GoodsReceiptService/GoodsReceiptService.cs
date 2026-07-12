@@ -90,7 +90,7 @@ namespace ERPSystem.Application.Services.GoodsReceiptService
                         Reason = $"Goods Receipt for Purchase Order #{po.Id}"
                     };
 
-                    await _stockService.IncreaseStockByIdAsync(userId, increaseDto, IsCommit: false);
+                    await _stockService.IncreaseStockByIdAsync(increaseDto, IsCommit: false);
                 }
 
 

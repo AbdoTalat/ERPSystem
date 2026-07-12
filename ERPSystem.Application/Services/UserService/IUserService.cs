@@ -17,6 +17,6 @@ namespace ERPSystem.Application.Services.UserService
         Task<ApiResponseHelper<GetUserByIdDTO>> EditUserAsync(int Id, EditUserDTO userDTO);
         Task<ApiResponseHelper<string>> DeleteUserByIdAsync(int Id);
         Task<ApiResponseHelper<string>> AssignRolesToUSerAsync(int userId, AssignRolesToUserDTO rolesToUserDTO);
-        Task<ApiResponseHelper<object>> ChangeDefaultBranch(int userId, int branchId);
+        Task<ApiResponseHelper<string>> ChangeDefaultBranch(int userId, int branchId);
     }
 }

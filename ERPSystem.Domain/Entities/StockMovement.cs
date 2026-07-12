@@ -8,10 +8,8 @@ using System.Threading.Tasks;
 
 namespace ERPSystem.Domain.Entities
 {
-    public class StockMovement : IHasBranch
+    public class StockMovement : BaseEntity, IHasBranch, IHasTenant
     {
-        public int Id { get; set; }
-
         public int StockId { get; set; }
         public Stock? Stock { get; set; }
 
@@ -24,11 +22,10 @@ namespace ERPSystem.Domain.Entities
         public int Quantity { get; set; } // Positive = In, Negative = Out
         public string? Reason { get; set; }
 
-        public int UserId { get; set; }
-        public AppUser? AppUser { get; set; }    
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
         public int BranchId { get; set; }
         public Branch? Branch { get; set; }
+
+        public Guid TenantId { get; set; }
+        public Tenant? Tenant { get; set; }
     }
 }

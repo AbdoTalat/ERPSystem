@@ -78,7 +78,7 @@ namespace ERPSystem.API.Controllers
                 return BadRequest(new { Error = ModelState });
             }
 
-            var result = await _stockService.IncreaseStockByIdAsync(UserId, Smodel, IsCommit: true);
+            var result = await _stockService.IncreaseStockByIdAsync(Smodel, IsCommit: true);
             return StatusCode(result.StatusCode, result);
         }
 
@@ -91,7 +91,7 @@ namespace ERPSystem.API.Controllers
                 return BadRequest(new { Error = ModelState });
             }
 
-            var result = await _stockService.DecreaseStockByIdAsync(UserId, model);
+            var result = await _stockService.DecreaseStockByIdAsync(model);
             return StatusCode(result.StatusCode, result);
         }
 
@@ -104,7 +104,7 @@ namespace ERPSystem.API.Controllers
                 return BadRequest(new { Error = ModelState });
             }
 
-            var result = await _stockService.TransferStockAsync(UserId, model);
+            var result = await _stockService.TransferStockAsync(model);
             return StatusCode(result.StatusCode, result);
         }
 

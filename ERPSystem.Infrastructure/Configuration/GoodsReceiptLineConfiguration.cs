@@ -22,6 +22,13 @@ namespace ERPSystem.Infrastructure.Configuration
               .WithMany(b => b.GoodsReceiptLines)
               .HasForeignKey(r => r.ProductId)
               .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(x => x.TenantId);
+
+            builder.HasOne(b => b.Tenant)
+                .WithMany()
+                .HasForeignKey(b => b.TenantId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
