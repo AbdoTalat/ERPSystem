@@ -15,36 +15,21 @@ namespace ERPSystem.Infrastructure.Seed
         public static async Task SeedFromJsonAsync<T>(
             this AppDbContext context,
             IHostEnvironment env,
-            string fileName) where T : class
+            string fileName,
+            Func<T, Task<bool>> exists)
+            where T : class
         {
-            var solutionRoot = Directory.GetParent(env.ContentRootPath)?.FullName;
+            var entities = await SeedHelper.ReadJsonAsync<T>(env, fileName);
 
-            var filePath = Path.Combine(
-                solutionRoot!,
-                "ERPSystem.Infrastructure",
-                "Seed",
-                "SeedData",
-                fileName
-            );
+            foreach (var entity in entities)
+            {
+                if (!await exists(entity))
+                {
+                    context.Set<T>().Add(entity);
+                }
+            }
 
-            if (!File.Exists(filePath))
-                return;
-
-            var dbSet = context.Set<T>();
-
-            if (await dbSet.AnyAsync())
-                return;
-
-            var jsonData = await File.ReadAllTextAsync(filePath);
-            var entities = JsonConvert.DeserializeObject<List<T>>(jsonData) ?? new List<T>();
-
-            if (entities.Count == 0)
-                return;
-
-            await dbSet.AddRangeAsync(entities);
             await context.SaveChangesAsync();
         }
     }
-
-
 }

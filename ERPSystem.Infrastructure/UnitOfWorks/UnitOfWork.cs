@@ -17,7 +17,7 @@ namespace ERPSystem.Infrastructure.UnitOfWorks
     public class unitOfWork : IUnitOfWork
     {
         private readonly AppDbContext _context;
-        //private IDbContextTransaction? _transaction;
+        private IDbContextTransaction? _transaction;
         private readonly IConfigurationProvider _mapperConfig;
         private readonly IUserContext _userContext;
         private readonly Dictionary<Type, object> _repositories = new Dictionary<Type, object>();
@@ -50,6 +50,54 @@ namespace ERPSystem.Infrastructure.UnitOfWorks
             ApplyTenant();    
             return await _context.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task BeginTransactionAsync()
+        {
+            if (_transaction == null)
+            {
+                _transaction = await _context.Database.BeginTransactionAsync();
+            }
+        }
+        public async Task CommitTransactionAsync()
+        {
+            if (_transaction == null)
+                throw new InvalidOperationException("No active transaction to commit.");
+
+            try
+            {
+                await CommitAsync();
+                await _transaction.CommitAsync();
+            }
+            catch
+            {
+                await RollbackTransactionAsync();
+                throw;
+            }
+            finally
+            {
+                if (_transaction != null)
+                {
+                    await _transaction.DisposeAsync();
+                    _transaction = null;
+                }
+            }
+        }
+        public async Task RollbackTransactionAsync()
+        {
+            if (_transaction != null)
+            {
+                await _transaction.RollbackAsync();
+                await _transaction.DisposeAsync();
+                _transaction = null;
+            }
+        }
+        public void Dispose()
+        {
+            _transaction?.Dispose();
+            _context.Dispose();
+        }
+
+        #region Private Methods
         private void ApplyAuditFields()
         {
             var entries = _context.ChangeTracker
@@ -86,51 +134,6 @@ namespace ERPSystem.Infrastructure.UnitOfWorks
                     throw new InvalidOperationException("TenantId is not available in the user context.");
             }
         }
-
-        //public async Task BeginTransactionAsync()
-        //{
-        //    if (_transaction == null)
-        //    {
-        //        _transaction = await _context.Database.BeginTransactionAsync();
-        //    }
-        //}
-        //public async Task CommitTransactionAsync()
-        //{
-        //    if (_transaction == null)
-        //        throw new InvalidOperationException("No active transaction to commit.");
-
-        //    try
-        //    {
-        //        await CommitAsync();
-        //        await _transaction.CommitAsync();
-        //    }
-        //    catch
-        //    {
-        //        await RollbackTransactionAsync();
-        //        throw;
-        //    }
-        //    finally
-        //    {
-        //        if (_transaction != null)
-        //        {
-        //            await _transaction.DisposeAsync();
-        //            _transaction = null;
-        //        }
-        //    }
-        //}
-        //public async Task RollbackTransactionAsync()
-        //{
-        //    if (_transaction != null)
-        //    {
-        //        await _transaction.RollbackAsync();
-        //        await _transaction.DisposeAsync();
-        //        _transaction = null;
-        //    }
-        //}
-        public void Dispose()
-        {
-           // _transaction?.Dispose();
-            _context.Dispose();
-        }
+        #endregion
     }
 }

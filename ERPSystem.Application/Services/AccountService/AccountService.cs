@@ -1,4 +1,5 @@
 ﻿using ERPSystem.Application.DTOs.Account;
+using ERPSystem.Application.IRepository;
 using ERPSystem.Application.Services.TokenService;
 using ERPSystem.Domain;
 using ERPSystem.Domain.Entities;
@@ -20,14 +21,17 @@ namespace ERPSystem.Application.Services.AccountService
         private readonly UserManager<AppUser> _userManager;
         private readonly ITokenService _tokenService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IRoleRepository _roleRepository;
 
         public AccountService(UserManager<AppUser> userManager,
             ITokenService tokenService,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IRoleRepository roleRepository)
         {
             _userManager = userManager;
             _tokenService = tokenService;
             _unitOfWork = unitOfWork;
+            _roleRepository = roleRepository;
         }
 
         public async Task<ApiResponseHelper<LoginResultDTO>> LoginAsync(LoginDTO loginDTO)
@@ -36,7 +40,6 @@ namespace ERPSystem.Application.Services.AccountService
                 .IgnoreQueryFilters()
                 .SingleOrDefaultAsync(x =>
                     x.NormalizedEmail == loginDTO.Email.ToUpper());
-            //var user = await _userManager.FindByEmailAsync(loginDTO.Email);
             if (user == null)
                 return ApiResponseHelper<LoginResultDTO>.ResponseFailure(StatusCodes.NOT_FOUND, "Invalid email address.");
 
@@ -45,7 +48,7 @@ namespace ERPSystem.Application.Services.AccountService
 
             try
             {
-                var roles = await _userManager.GetRolesAsync(user);
+                var roles = await _roleRepository.GetAllRolesByUserIdAsync(user.Id);
                 var accessToken = await _tokenService.GenerateAccessTokenAsync(user, roles.ToList());
                 var refreshToken = await _tokenService.GenerateRefreshTokenAsync();
 

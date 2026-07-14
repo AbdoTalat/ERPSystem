@@ -22,7 +22,8 @@ namespace HotelApp.Infrastructure
 		public CustomClaimsPrincipalFactory(
 			UserManager<AppUser> userManager,
 			RoleManager<AppRole> roleManager,
-			IOptions<IdentityOptions> optionsAccessor, AppDbContext context)
+			IOptions<IdentityOptions> optionsAccessor,
+            AppDbContext context)
 			: base(userManager, roleManager, optionsAccessor)
 		{
 			_userManager = userManager;
@@ -65,7 +66,7 @@ namespace HotelApp.Infrastructure
 			var DefaultBranchId = _context.UserBranches
                 .IgnoreQueryFilters()
 				.Where(c => c.UserId == user.Id && c.IsDefault == true)
-				.Select(b => b.Id)
+				.Select(b => b.BranchId)
 				.FirstOrDefault();
 
             if (DefaultBranchId != 0)

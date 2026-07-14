@@ -25,8 +25,6 @@ namespace ERPSystem.API
 			builder.Services.AddSwaggerGen();
 
             //App Dependency Injection
-            Console.WriteLine(builder.Configuration["JwtSettings:Key"]);
-            Console.WriteLine(builder.Configuration["JwtSettings:Key"]);
             builder.Services.AddAppDI(builder.Configuration, new PermissionLoader(builder.Environment));
 
             builder.Services.AddCors(corsOptions =>

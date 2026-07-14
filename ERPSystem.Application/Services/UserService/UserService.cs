@@ -110,7 +110,8 @@ namespace ERPSystem.Application.Services.UserService
         public async Task<ApiResponseHelper<GetUserBranchesDTO>> GetUserBranchesByUserIdAsync(int userId)
         {
             var userBranches = await _userRepository.GetUserBranchesByUserIdAsync(userId);
-
+            if(userBranches.BranchNames.Count() <= 0)
+                return ApiResponseHelper<GetUserBranchesDTO>.ResponseFailure(StatusCodes.NOT_FOUND, $"User branches not found for user with ID: {userId}");
             return ApiResponseHelper<GetUserBranchesDTO>.ResponseSuccess(data: userBranches);
 
         }

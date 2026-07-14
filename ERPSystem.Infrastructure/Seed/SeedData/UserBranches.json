@@ -1,0 +1,14 @@
+[
+  {
+    "UserName": "admin",
+    "BranchName": "Cairo Branch",
+    "TenantId": "11111111-1111-1111-1111-111111111111",
+    "IsDefault": true
+  },
+  {
+    "UserName": "admin",
+    "BranchName": "Alexandria Branch",
+    "TenantId": "11111111-1111-1111-1111-111111111111",
+    "IsDefault": false
+  }
+]

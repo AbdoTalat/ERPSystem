@@ -11,5 +11,6 @@ namespace ERPSystem.Application.IRepository
     {
         Task<bool> IsRoleAssignedToAnyUserAsync(int Id);
         Task<List<GetPermissionDTO>> GetAllPermissionsAsync();
+        Task<List<string>> GetAllRolesByUserIdAsync(int UserId);
     }
 }

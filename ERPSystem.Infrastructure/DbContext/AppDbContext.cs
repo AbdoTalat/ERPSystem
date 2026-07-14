@@ -59,6 +59,7 @@ namespace ERPSystem.Infrastructure.DbContext
 			base.OnModelCreating(builder);
 
             #region Query Filters For Multi-Tenancy
+
             builder.Entity<Branch>().HasQueryFilter(b => b.TenantId == _userContext.TenantId);
             builder.Entity<Employee>().HasQueryFilter(e => e.TenantId == _userContext.TenantId);
             builder.Entity<Department>().HasQueryFilter(d => d.TenantId == _userContext.TenantId);
@@ -78,9 +79,11 @@ namespace ERPSystem.Infrastructure.DbContext
             builder.Entity<Tenant>().HasQueryFilter(t => t.Id == _userContext.TenantId);
             builder.Entity<AppUser>().HasQueryFilter(u => u.TenantId == _userContext.TenantId);
             builder.Entity<AppRole>().HasQueryFilter(r => r.TenantId == _userContext.TenantId);
+
             #endregion
 
             #region Configurations
+
             /* Auth Configurations */
             builder.ApplyConfiguration(new AppUserConfiguration());
             builder.ApplyConfiguration(new AppRoleConfiguration());

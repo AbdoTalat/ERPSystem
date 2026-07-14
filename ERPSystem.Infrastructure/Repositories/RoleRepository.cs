@@ -57,5 +57,17 @@ namespace ERPSystem.Infrastructure.Repositories
 
             return grouped;
         }
+        public async Task<List<string>> GetAllRolesByUserIdAsync(int UserId)
+        {
+            var roleNames = await (
+                from userRoles in _context.UserRoles
+                join roles in _context.Roles.IgnoreQueryFilters()
+                     on userRoles.RoleId equals roles.Id
+                 where userRoles.UserId == UserId
+                 select roles.Name
+             ).ToListAsync();
+
+            return roleNames;
+        }
     }
 }

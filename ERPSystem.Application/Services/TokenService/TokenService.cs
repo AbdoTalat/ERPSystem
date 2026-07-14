@@ -42,7 +42,7 @@ namespace ERPSystem.Application.Services.TokenService
             var principal = await _signInManager.CreateUserPrincipalAsync(user);
             var authClaims = principal.Claims.ToList();
 
-            authClaims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
+            //authClaims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
             var jti = Guid.NewGuid().ToString();
             authClaims.Add(new Claim(JwtRegisteredClaimNames.Jti, jti));
 

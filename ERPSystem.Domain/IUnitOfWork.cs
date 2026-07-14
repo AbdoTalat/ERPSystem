@@ -10,10 +10,9 @@ namespace ERPSystem.Domain
 	{
 		IGenericRepository<T> Repository<T>() where T : class;
 		Task<int> CommitAsync(bool skipAuditFields = false, CancellationToken cancellationToken = default);
+		Task BeginTransactionAsync();
+		Task CommitTransactionAsync();
+		Task RollbackTransactionAsync();
 
-		//Task BeginTransactionAsync();
-		//Task CommitTransactionAsync();
-		//Task RollbackTransactionAsync();
-
-    }
+	}
 }
